@@ -1,8 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-fern-50: #f0fdf4;
+  --color-fern-100: #dbfde6;
+  --color-fern-200: #baf8cf;
+  --color-fern-300: #84f1aa;
+  --color-fern-400: #48e07d;
+  --color-fern-500: #1db954;
+  --color-fern-600: #14a547;
+  --color-fern-700: #13823b;
+  --color-fern-800: #156633;
+  --color-fern-900: #13542c;
+  --color-fern-950: #042f15;
+
+  --background: var(--color-fern-50);
+  --foreground: var(--color-fern-950);
+  --surface: #ffffff;
+  --muted: var(--color-fern-800);
+  --border: var(--color-fern-200);
+  --accent: var(--color-fern-500);
+
+  --text-primary: var(--color-fern-950);
+  --text-strong: var(--color-fern-900);
+  --text-muted: var(--color-fern-700);
+
+  --link: #0f4728;
+  --link-hover: var(--color-fern-600);
+
+  --button-bg: var(--color-fern-700);
+  --button-bg-hover: var(--color-fern-800);
+  --button-border: var(--color-fern-800);
+  --button-text: #ffffff;
+
+  --table-header-bg: var(--color-fern-800);
+  --table-header-text: #ffffff;
+  --table-row-hover: #e6f7eb;
 }
 
 @theme inline {
@@ -14,13 +46,83 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--color-fern-950);
+    --foreground: var(--color-fern-50);
+    --surface: var(--color-fern-900);
+    --muted: var(--color-fern-200);
+    --border: var(--color-fern-700);
+
+    --text-primary: var(--color-fern-50);
+    --text-strong: #ffffff;
+    --text-muted: var(--color-fern-200);
+
+    --link: var(--color-fern-100);
+    --link-hover: var(--color-fern-300);
+
+    --button-bg: var(--color-fern-700);
+    --button-bg-hover: var(--color-fern-600);
+    --button-border: var(--color-fern-600);
+    --button-text: #ffffff;
+
+    --table-header-bg: var(--color-fern-800);
+    --table-header-text: #ffffff;
+    --table-row-hover: #0f4728;
   }
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--text-primary);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+button {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--button-bg-hover);
+  box-shadow: 0 8px 18px rgba(20, 165, 71, 0.24);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-color: var(--border);
 }
