@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import TrackList from "../components/TrackList";
+import GenreChart from "../components/GenreChart";
 
 const PAGE_SIZE = 10;
 const MAX_TRACKS = 50;
@@ -56,6 +57,29 @@ export default function YlexPlaylistPage() {
     return Math.ceil(tracks.length / PAGE_SIZE);
   }, [tracks.length]);
 
+  const genreStats = useMemo(() => {
+    if (!Array.isArray(tracks) || tracks.length === 0) return [];
+
+    const counts = new Map(); // genre -> lukumäärä
+
+    for (const track of tracks) {
+      const rawGenres = Array.isArray(track.genres) ? track.genres : [];
+
+      // If track has no genres at all, treat it as ["unknown"]
+      const genresToUse = rawGenres.length > 0 ? rawGenres : ["unknown"];
+
+      for (const g of genresToUse) {
+        // If genre string is empty/null, also map it to "unknown"
+        const key = (g && g.trim().length > 0 ? g : "unknown").toLowerCase();
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+
+    return Array.from(counts.entries())
+      .map(([genre, count]) => ({ genre, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [tracks]);
+
   const startIndex = page * PAGE_SIZE;
   const pageTracks = tracks.slice(startIndex, startIndex + PAGE_SIZE);
 
@@ -70,17 +94,32 @@ export default function YlexPlaylistPage() {
     <main className="px-6 py-10 text-(--text-primary)">
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
         <header className="space-y-2">
-          <p className="text-sm uppercase tracking-[0.2em] text-(--text-muted)">
-            YleX
-          </p>
-          <h1 className="text-3xl font-semibold text-(--text-strong)">
-            Uuden Musiikin Spotify-soittolista
-          </h1>
-          <p className="text-(--text-primary)">
-            Näytä 10 kappaletta kerrallaan ja selaa nuolilla 50 kappaleen
-            joukkoa.
-          </p>
+          <div className="">
+            <p className="text-sm">
+              pieni yläotsikko, esim. “Datajournalismi • YleX Uuden Musiikin X”
+            </p>
+            <h1 className="text-4xl p-4">
+              Mitä YLEX Uuden Musiikin listaan lisätään?
+            </h1>
+            <p className="text-sm">
+              2–3 virkettä kuvaus: mistä soittolistasta on kyse mitä dataa
+              haetaan mitä käyttäjä voi tehdä (selata, tarkastella genrejä tms.)
+            </p>
+          </div>
+          <div>
+            <img></img>
+          </div>
         </header>
+
+        <section>
+          <h2>Mitä analysoidaan?</h2>
+          <p>
+            kappale 1: lyhyt taustoitus YleX:n Uuden Musiikin X -ohjelmasta /
+            soittolistasta kappale. 2: miten data haetaan (Spotify API,
+            soittolistan kappaleet + artistien genret) kappale. 3: mitä käyttäjä
+            näkee alempana sivulla (taulukko + genregraafi + loppuanalyysi).
+          </p>
+        </section>
 
         {loading && (
           <div className="rounded-lg border border-(--border) bg-(--surface) p-4 text-(--text-primary) shadow-sm">
@@ -101,35 +140,43 @@ export default function YlexPlaylistPage() {
         )}
 
         {!loading && !error && pageTracks.length > 0 && (
-          <>
-            <TrackList tracks={pageTracks} offset={startIndex} />
+          <TrackList
+            tracks={pageTracks}
+            offset={startIndex}
+            page={page}
+            totalPages={totalPages}
+            onPrevPage={handlePrevPage}
+            onNextPage={handleNextPage}
+          />
+        )}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-(--border) bg-(--surface) px-4 py-3 text-sm text-(--text-primary) shadow-sm">
-              <button
-                type="button"
-                onClick={handlePrevPage}
-                disabled={page === 0}
-                className="flex items-center gap-1 rounded border border-(--button-border) bg-(--button-bg) px-3 py-1 font-medium text-(--button-text) transition hover:bg-(--button-bg-hover) disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="Edellinen 10 kappaletta"
-              >
-                Edellinen
-              </button>
+        {genreStats.length > 0 && (
+          <section className="mt-10 space-y-6">
+            <GenreChart stats={genreStats} />
 
-              <span className="font-semibold text-(--text-strong)">
-                Sivu {page + 1} / {Math.max(totalPages, 1)}
-              </span>
+            <article className="mx-auto max-w-3xl space-y-3 rounded-lg bg-(--surface-subtle) p-4 text-sm text-(--text-primary)">
+              <h2 className="text-base font-semibold text-(--text-strong)">
+                Mitä soittolista kertoo tämän hetken musiikista?
+              </h2>
 
-              <button
-                type="button"
-                onClick={handleNextPage}
-                disabled={page + 1 >= totalPages}
-                className="flex items-center gap-1 rounded border border-(--button-border) bg-(--button-bg) px-3 py-1 font-medium text-(--button-text) transition hover:bg-(--button-bg-hover) disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="Seuraavat 10 kappaletta"
-              >
-                Seuraava
-              </button>
-            </div>
-          </>
+              <p>
+                Tämän otoksen perusteella Uuden Musiikin X -soittolista
+                painottuu selvästi genreen{" "}
+                <strong>{genreStats[0]?.genre}</strong>. Se on soittolistalla
+                yleisin genre, ja sen alle osuu{" "}
+                <strong>{genreStats[0]?.count}</strong> kappaletta
+                viidenkymmenen biisin joukosta.
+              </p>
+
+              <p>
+                Samalla listalla on yhteensä{" "}
+                <strong>{genreStats.length}</strong> yleisintä genreä, mikä
+                kertoo, että soittolista kokoaa sekä valtavirtaa että pienempiä
+                alakulttuureja saman katon alle. Demossa käytetty genredata
+                tulee suoraan artistien Spotify-profiileista.
+              </p>
+            </article>
+          </section>
         )}
       </div>
     </main>
