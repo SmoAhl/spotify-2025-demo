@@ -2,17 +2,20 @@
 
 import React from "react";
 import { formatDuration } from "@/lib/formatter";
+import { Pagination } from "./Pagination"; // polku sen mukaan mihin laitat
+import { getArtistNodes, getGenresText } from "@/lib/trackHelper";
 
 /**
  * TrackList
  *  - props.tracks: taulukko olioita muodossa
  *    {
  *      id, name,
- *      artists: [{ id, name }],
+ *      artists: [{ id, name, popularity?, followers?, externalUrl? }],
  *      album,
  *      genres: [ ... ],
  *      durationMs,
- *      externalUrl
+ *      externalUrl,
+ *      popularity?
  *    }
  *  - props.offset: rivinumeroinnin aloitus (esim. currentPage * pageSize)
  *  - props.page: nykyinen sivunumero (0-indeksoitu)
@@ -53,12 +56,8 @@ export default function TrackList({
           </thead>
           <tbody>
             {tracks.map((track, index) => {
-              const artists = (track.artists || [])
-                .map((a) => a.name)
-                .join(", ");
-              const genreList = Array.isArray(track.genres) ? track.genres : [];
-              const genres =
-                genreList.length > 0 ? genreList.join(", ") : "unknown";
+              const rowNumber = offset + index + 1;
+              const trackTooltipText = `Popularity: ${track.popularity ?? "?"}`;
 
               return (
                 <tr
@@ -70,6 +69,7 @@ export default function TrackList({
                       <a
                         href={track.externalUrl}
                         target="_blank"
+                        title={trackTooltipText}
                         rel="noreferrer"
                         className="text-(--link) underline-offset-4 hover:text-(--link-hover) hover:underline"
                       >
@@ -79,11 +79,19 @@ export default function TrackList({
                       track.name
                     )}
                   </td>
-                  <td className="px-3 py-2 text-(--text-primary)">{artists}</td>
+
+                  <td className="px-3 py-2 text-(--text-primary)">
+                    {getArtistNodes(track)}
+                  </td>
+
                   <td className="px-3 py-2 text-(--text-primary)">
                     {track.album}
                   </td>
-                  <td className="px-3 py-2 text-(--text-muted)">{genres}</td>
+
+                  <td className="px-3 py-2 text-(--text-muted)">
+                    {getGenresText(track)}
+                  </td>
+
                   <td className="px-3 py-2 text-(--text-muted)">
                     {formatDuration(track.durationMs)}
                   </td>
@@ -94,31 +102,12 @@ export default function TrackList({
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-(--border) bg-(--surface) px-4 py-3 text-sm text-(--text-primary) shadow-sm">
-        <button
-          type="button"
-          onClick={onPrevPage}
-          disabled={page === 0}
-          className="flex items-center gap-1 rounded border border-(--button-border) bg-(--button-bg) px-3 py-1 font-medium text-(--button-text) transition hover:bg-(--button-bg-hover) disabled:cursor-not-allowed disabled:opacity-60"
-          aria-label="Edellinen 10 kappaletta"
-        >
-          Edellinen
-        </button>
-
-        <span className="font-semibold text-(--text-strong)">
-          Sivu {page + 1} / {Math.max(totalPages, 1)}
-        </span>
-
-        <button
-          type="button"
-          onClick={onNextPage}
-          disabled={page + 1 >= totalPages}
-          className="flex items-center gap-1 rounded border border-(--button-border) bg-(--button-bg) px-3 py-1 font-medium text-(--button-text) transition hover:bg-(--button-bg-hover) disabled:cursor-not-allowed disabled:opacity-60"
-          aria-label="Seuraavat 10 kappaletta"
-        >
-          Seuraava
-        </button>
-      </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPrevPage={onPrevPage}
+        onNextPage={onNextPage}
+      />
     </section>
   );
 }
