@@ -2,34 +2,15 @@
 
 import React from "react";
 import { formatDuration } from "@/lib/formatter";
-import { Pagination } from "./Pagination"; // polku sen mukaan mihin laitat
 import { getArtistNodes, getGenresText } from "@/lib/trackHelper";
 
-/**
- * TrackList
- *  - props.tracks: taulukko olioita muodossa
- *    {
- *      id, name,
- *      artists: [{ id, name, popularity?, followers?, externalUrl? }],
- *      album,
- *      genres: [ ... ],
- *      durationMs,
- *      externalUrl,
- *      popularity?
- *    }
- *  - props.offset: rivinumeroinnin aloitus (esim. currentPage * pageSize)
- *  - props.page: nykyinen sivunumero (0-indeksoitu)
- *  - props.totalPages: sivujen kokonaismäärä
- *  - props.onPrevPage: funktio edellinen-sivun painikkeelle
- *  - props.onNextPage: funktio seuraava-sivun painikkeelle
- */
 export default function TrackList({
   tracks,
   offset = 0,
-  page,
-  totalPages,
-  onPrevPage,
-  onNextPage,
+  sortKey,
+  sortDirection,
+  onChangeSort,
+  pageSize = 10,
 }) {
   if (!Array.isArray(tracks) || tracks.length === 0) {
     return (
@@ -39,21 +20,130 @@ export default function TrackList({
     );
   }
 
+  function getSortIndicator(columnKey, sortKey, sortDirection) {
+    if (sortKey !== columnKey) return "↑↓";
+    if (sortDirection === "none") return "";
+    return sortDirection === "asc" ? "↑" : "↓";
+  }
+
+  const emptyRowCount = Math.max(0, pageSize - tracks.length);
+
   return (
     <section className="mt-6 space-y-2">
       <h2 className="text-2xl font-semibold text-(--text-strong)">Kappaleet</h2>
 
       <div className="overflow-x-auto rounded-lg border border-(--border) bg-(--surface) shadow-sm">
-        <table className="min-w-full text-sm text-(--text-primary)">
+        <table
+          className="w-full text-sm text-(--text-primary)"
+          style={{ tableLayout: "fixed" }}
+        >
+          <colgroup>
+            <col className="w-[28%]" />
+            <col className="w-[24%]" />
+            <col className="w-[20%]" />
+            <col className="w-[20%]" />
+            <col className="w-[8%]" />
+          </colgroup>
+
           <thead className="bg-(--table-header-bg) text-(--table-header-text)">
             <tr>
-              <th className="px-3 py-2 text-left">Kappale</th>
-              <th className="px-3 py-2 text-left">Artistit</th>
-              <th className="px-3 py-2 text-left">Albumi</th>
-              <th className="px-3 py-2 text-left">Genret</th>
-              <th className="px-3 py-2 text-left">Kesto</th>
+              <th className="px-3 py-2 text-left">
+                <button
+                  type="button"
+                  onClick={() => onChangeSort("title")}
+                  className="inline-flex items-center gap-1 font-semibold text-(--table-header-text)"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span>Kappale</span>
+                  <span>
+                    {getSortIndicator("title", sortKey, sortDirection)}
+                  </span>
+                </button>
+              </th>
+
+              <th className="px-3 py-2 text-left">
+                <button
+                  type="button"
+                  onClick={() => onChangeSort("artists")}
+                  className="inline-flex items-center gap-1 font-semibold text-(--table-header-text)"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span>Artistit</span>
+                  <span>
+                    {getSortIndicator("artists", sortKey, sortDirection)}
+                  </span>
+                </button>
+              </th>
+
+              <th className="px-3 py-2 text-left">
+                <button
+                  type="button"
+                  onClick={() => onChangeSort("album")}
+                  className="inline-flex items-center gap-1 font-semibold text-(--table-header-text)"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span>Albumi</span>
+                  <span>
+                    {getSortIndicator("album", sortKey, sortDirection)}
+                  </span>
+                </button>
+              </th>
+
+              <th className="px-3 py-2 text-left">
+                <button
+                  type="button"
+                  onClick={() => onChangeSort("genre")}
+                  className="inline-flex items-center gap-1 font-semibold text-(--table-header-text)"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span>Genret</span>
+                  <span>
+                    {getSortIndicator("genre", sortKey, sortDirection)}
+                  </span>
+                </button>
+              </th>
+
+              <th className="px-3 py-2 text-left">
+                <button
+                  type="button"
+                  onClick={() => onChangeSort("duration")}
+                  className="inline-flex items-center gap-1 font-semibold text-(--table-header-text)"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span>Kesto</span>
+                  <span>
+                    {getSortIndicator("duration", sortKey, sortDirection)}
+                  </span>
+                </button>
+              </th>
             </tr>
           </thead>
+
           <tbody>
             {tracks.map((track, index) => {
               const rowNumber = offset + index + 1;
@@ -64,7 +154,7 @@ export default function TrackList({
                   key={track.id ?? rowNumber}
                   className="border-t border-(--border) hover:bg-(--table-row-hover)"
                 >
-                  <td className="px-3 py-2 font-semibold text-(--text-strong)">
+                  <td className="px-3 py-2 font-semibold text-(--text-strong) whitespace-nowrap truncate">
                     {track.externalUrl ? (
                       <a
                         href={track.externalUrl}
@@ -80,34 +170,39 @@ export default function TrackList({
                     )}
                   </td>
 
-                  <td className="px-3 py-2 text-(--text-primary)">
+                  <td className="px-3 py-2 text-(--text-primary) whitespace-nowrap truncate">
                     {getArtistNodes(track)}
                   </td>
 
-                  <td className="px-3 py-2 text-(--text-primary)">
+                  <td className="px-3 py-2 text-(--text-primary) whitespace-nowrap truncate">
                     {track.album}
                   </td>
 
-                  <td className="px-3 py-2 text-(--text-muted)">
+                  <td className="px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
                     {getGenresText(track)}
                   </td>
 
-                  <td className="px-3 py-2 text-(--text-muted)">
+                  <td className="text-right px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
                     {formatDuration(track.durationMs)}
                   </td>
                 </tr>
               );
             })}
+
+            {Array.from({ length: emptyRowCount }).map((_, i) => (
+              <tr
+                key={`empty-${i}`}
+                className="border-t border-(--border)"
+                aria-hidden="true"
+              >
+                <td className="px-3 py-2" colSpan={5}>
+                  &nbsp;
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPrevPage={onPrevPage}
-        onNextPage={onNextPage}
-      />
     </section>
   );
 }

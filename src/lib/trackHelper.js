@@ -41,10 +41,71 @@ export function getArtistNodes(track) {
   });
 }
 
-/**
- * Yhdistää track.genres-taulukon merkkijonoksi ("unknown" jos tyhjä/puuttuu)
- */
 export function getGenresText(track) {
   const genreList = Array.isArray(track.genres) ? track.genres : [];
-  return genreList.length > 0 ? genreList.join(", ") : "unknown";
+  return genreList.length > 0 ? genreList.slice(0, 2).join(", ") : "unknown";
+}
+
+// Tätä käytetään lajitteluun
+export function getGenreSortKey(track) {
+  const genreList = Array.isArray(track.genres) ? track.genres : [];
+  if (genreList.length === 0) return "unknown";
+
+  // Vaihtoehto A: käytä ensimmäistä genreä
+  return genreList[0].toLowerCase();
+
+  // Vaihtoehto B: jos haluat lajitella koko yhdistetyn stringin mukaan:
+  // return genreList.join(", ").toLowerCase();
+}
+
+export function sortTracks(tracks, sortKey, sortDirection) {
+  if (!Array.isArray(tracks)) return [];
+
+  if (!sortKey || sortDirection === "none") {
+    return tracks;
+  }
+
+  const dir = sortDirection === "desc" ? -1 : 1;
+
+  return [...tracks].sort((a, b) => {
+    switch (sortKey) {
+      case "title": {
+        const an = a.name?.toLowerCase() ?? "";
+        const bn = b.name?.toLowerCase() ?? "";
+        if (an < bn) return -1 * dir;
+        if (an > bn) return 1 * dir;
+        return 0;
+      }
+      case "artists": {
+        const aa = (a.artists?.[0]?.name || "").toLowerCase();
+        const ba = (b.artists?.[0]?.name || "").toLowerCase();
+        if (aa < ba) return -1 * dir;
+        if (aa > ba) return 1 * dir;
+        return 0;
+      }
+      case "album": {
+        const aal = a.album?.toLowerCase() ?? "";
+        const bal = b.album?.toLowerCase() ?? "";
+        if (aal < bal) return -1 * dir;
+        if (aal > bal) return 1 * dir;
+        return 0;
+      }
+      case "duration": {
+        const ad = a.durationMs ?? 0;
+        const bd = b.durationMs ?? 0;
+        if (ad < bd) return -1 * dir;
+        if (ad > bd) return 1 * dir;
+        return 0;
+      }
+      case "genre": {
+        const ag = getGenreSortKey(a);
+        const bg = getGenreSortKey(b);
+        if (ag < bg) return -1 * dir;
+        if (ag > bg) return 1 * dir;
+        return 0;
+      }
+      default:
+        return 0;
+    }
+  });
 }
