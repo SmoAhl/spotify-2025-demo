@@ -43,27 +43,30 @@ async function fetchPlaylistTracks(playlistId, token) {
 }
 
 async function fetchArtistsByIds(artistIds, token) {
-  const ids = artistIds.slice(0, 50).join(",");
-  const url = `https://api.spotify.com/v1/artists?ids=${ids}`;
-
-  const res = await fetch(url, {
-    headers: { Authorization: "Bearer " + token },
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Spotify artist error:", errorText);
-    throw new Error(`Artist fetch failed: ${errorText}`);
-  }
-
-  const artistData = await res.json();
-  const artists = Array.isArray(artistData.artists) ? artistData.artists : [];
-
   const artistGenresById = new Map();
 
-  for (const a of artists) {
-    const genres = Array.isArray(a.genres) ? a.genres : [];
-    artistGenresById.set(a.id, genres);
+  // pilkotaan max 50 ID:n palasiin
+  for (let i = 0; i < artistIds.length; i += 50) {
+    const chunk = artistIds.slice(i, i + 50);
+    const url = `https://api.spotify.com/v1/artists?ids=${chunk.join(",")}`;
+
+    const res = await fetch(url, {
+      headers: { Authorization: "Bearer " + token },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Spotify artist error:", errorText);
+      throw new Error(`Artist fetch failed: ${errorText}`);
+    }
+
+    const artistData = await res.json();
+    const artists = Array.isArray(artistData.artists) ? artistData.artists : [];
+
+    for (const a of artists) {
+      const genres = Array.isArray(a.genres) ? a.genres : [];
+      artistGenresById.set(a.id, genres);
+    }
   }
 
   return artistGenresById;
