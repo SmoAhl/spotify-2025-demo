@@ -1,100 +1,31 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import TrackList from "../components/TrackList";
 import GenreChart from "../components/GenreChart";
-
-const PAGE_SIZE = 10;
-const MAX_TRACKS = 50;
+import { Pagination } from "../components/Pagination";
+import { usePlaylist } from "@/hooks/usePlaylist";
 
 export default function YlexPlaylistPage() {
-  const [tracks, setTracks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadTracks() {
-      try {
-        setLoading(true);
-        const res = await fetch("/api/ylex-playlist");
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Soittolistan haku epäonnistui");
-        }
-        const data = await res.json();
-        const safeTracks = Array.isArray(data.tracks) ? data.tracks : [];
-        if (!cancelled) {
-          setTracks(safeTracks.slice(0, MAX_TRACKS));
-          setError(null);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err.message || "Tuntematon virhe");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadTracks();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    setPage(0);
-  }, [tracks.length]);
-
-  const totalPages = useMemo(() => {
-    if (tracks.length === 0) return 0;
-    return Math.ceil(tracks.length / PAGE_SIZE);
-  }, [tracks.length]);
-
-  const genreStats = useMemo(() => {
-    if (!Array.isArray(tracks) || tracks.length === 0) return [];
-
-    const counts = new Map(); // genre -> lukumäärä
-
-    for (const track of tracks) {
-      const rawGenres = Array.isArray(track.genres) ? track.genres : [];
-
-      // If track has no genres at all, treat it as ["unknown"]
-      const genresToUse = rawGenres.length > 0 ? rawGenres : ["unknown"];
-
-      for (const g of genresToUse) {
-        // If genre string is empty/null, also map it to "unknown"
-        const key = (g && g.trim().length > 0 ? g : "unknown").toLowerCase();
-        counts.set(key, (counts.get(key) ?? 0) + 1);
-      }
-    }
-
-    return Array.from(counts.entries())
-      .map(([genre, count]) => ({ genre, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [tracks]);
-
-  const startIndex = page * PAGE_SIZE;
-  const pageTracks = tracks.slice(startIndex, startIndex + PAGE_SIZE);
-
-  const handlePrevPage = () => setPage((prev) => Math.max(0, prev - 1));
-  const handleNextPage = () =>
-    setPage((prev) => {
-      const lastPage = Math.max(totalPages - 1, 0);
-      return Math.min(lastPage, prev + 1);
-    });
+  const {
+    loading,
+    error,
+    genreStats,
+    pageTracks,
+    startIndex,
+    page,
+    totalPages,
+    sortKey,
+    sortDirection,
+    handlePrevPage,
+    handleNextPage,
+    handleSortChange,
+  } = usePlaylist();
 
   return (
     <main className="px-6 py-10 text-(--text-primary)">
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
         <header className="space-y-2">
-          <div className="">
+          <div>
             <p className="text-sm">
               pieni yläotsikko, esim. “Datajournalismi • YleX Uuden Musiikin X”
             </p>
@@ -107,7 +38,7 @@ export default function YlexPlaylistPage() {
             </p>
           </div>
           <div>
-            <img></img>
+            <img />
           </div>
         </header>
 
@@ -140,14 +71,23 @@ export default function YlexPlaylistPage() {
         )}
 
         {!loading && !error && pageTracks.length > 0 && (
-          <TrackList
-            tracks={pageTracks}
-            offset={startIndex}
-            page={page}
-            totalPages={totalPages}
-            onPrevPage={handlePrevPage}
-            onNextPage={handleNextPage}
-          />
+          <>
+            <TrackList
+              tracks={pageTracks}
+              offset={startIndex}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+              onChangeSort={handleSortChange}
+              pageSize={10}
+            />
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPrevPage={handlePrevPage}
+              onNextPage={handleNextPage}
+            />
+          </>
         )}
 
         {genreStats.length > 0 && (
