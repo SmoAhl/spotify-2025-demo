@@ -43,11 +43,12 @@ async function fetchPlaylistTracks(playlistId, token) {
 }
 
 async function fetchArtistsByIds(artistIds, token) {
-  const artistGenresById = new Map();
+  const uniqueIds = Array.from(new Set(artistIds));
 
-  // pilkotaan max 50 ID:n palasiin
-  for (let i = 0; i < artistIds.length; i += 50) {
-    const chunk = artistIds.slice(i, i + 50);
+  const artistDataById = new Map();
+
+  for (let i = 0; i < uniqueIds.length; i += 50) {
+    const chunk = uniqueIds.slice(i, i + 50);
     const url = `https://api.spotify.com/v1/artists?ids=${chunk.join(",")}`;
 
     const res = await fetch(url, {
@@ -64,37 +65,65 @@ async function fetchArtistsByIds(artistIds, token) {
     const artists = Array.isArray(artistData.artists) ? artistData.artists : [];
 
     for (const a of artists) {
+      if (!a || !a.id) continue;
+
       const genres = Array.isArray(a.genres) ? a.genres : [];
-      artistGenresById.set(a.id, genres);
+      const followersTotal =
+        typeof a.followers?.total === "number" ? a.followers.total : 0;
+      const popularity = typeof a.popularity === "number" ? a.popularity : 0;
+      const externalUrl = a.external_urls?.spotify ?? null;
+
+      artistDataById.set(a.id, {
+        genres,
+        followers: followersTotal,
+        popularity,
+        externalUrl,
+      });
     }
   }
 
-  return artistGenresById;
+  return artistDataById;
 }
 
 function getUniqueArtistIdsFromTracks(tracks) {
   const artistIdSet = new Set();
   for (const track of tracks) {
-    for (const artist of track.artists) {
-      artistIdSet.add(artist.id);
+    const artists = Array.isArray(track.artists) ? track.artists : [];
+    for (const artist of artists) {
+      if (artist?.id) {
+        artistIdSet.add(artist.id);
+      }
     }
   }
   return Array.from(artistIdSet);
 }
 
-function addGenresToTracks(tracks, artistGenresById) {
+function addArtistInfoToTracks(tracks, artistDataById) {
   return tracks.map((track) => {
-    const genreSet = new Set();
+    const artists = Array.isArray(track.artists) ? track.artists : [];
 
-    for (const artist of track.artists) {
-      const genresForArtist = artistGenresById.get(artist.id) || [];
-      for (const genre of genresForArtist) {
-        genreSet.add(genre);
+    const enrichedArtists = artists.map((artist) => {
+      const data = artistDataById.get(artist.id);
+      return {
+        ...artist,
+        genres: data?.genres ?? [],
+        followers: data?.followers ?? 0,
+        popularity: data?.popularity ?? 0,
+        externalUrl: data?.externalUrl ?? null,
+      };
+    });
+
+    const genreSet = new Set();
+    for (const a of enrichedArtists) {
+      const genresForArtist = Array.isArray(a.genres) ? a.genres : [];
+      for (const g of genresForArtist) {
+        genreSet.add(g);
       }
     }
 
     return {
       ...track,
+      artists: enrichedArtists,
       genres: Array.from(genreSet),
     };
   });
@@ -116,11 +145,11 @@ export async function GET() {
       return NextResponse.json({ tracks });
     }
 
-    const artistGenresById = await fetchArtistsByIds(artistIds, token);
+    const artistDataById = await fetchArtistsByIds(artistIds, token);
 
-    const tracksWithGenres = addGenresToTracks(tracks, artistGenresById);
+    const tracksWithArtistInfo = addArtistInfoToTracks(tracks, artistDataById);
 
-    return NextResponse.json({ tracks: tracksWithGenres });
+    return NextResponse.json({ tracks: tracksWithArtistInfo });
   } catch (err) {
     console.error("playlist error:", err);
     return NextResponse.json(
