@@ -29,8 +29,10 @@ export default function TrackList({
   const emptyRowCount = Math.max(0, pageSize - tracks.length);
 
   return (
-    <section className="mt-6 space-y-2">
-      <h2 className="text-2xl font-semibold text-(--text-strong)">Kappaleet</h2>
+    <section className="space-y-2">
+      <h2 className="text-2xl font-semibold text-(--text-strong) pb-2">
+        Kappaleet
+      </h2>
 
       <div className="overflow-x-auto rounded-lg border border-(--border) bg-(--surface) shadow-sm">
         <table

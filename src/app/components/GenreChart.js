@@ -48,7 +48,7 @@ export default function GenreChart({ stats }) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl rounded-lg border border-(--border) bg-(--surface) p-4 shadow-sm">
+    <div className="mx-auto rounded-lg border border-(--border) bg-(--surface) p-6 shadow-sm">
       <h2 className="mb-3 text-lg font-semibold text-(--text-strong)">
         Genrejakauma Uuden Musiikin X -soittolistalla
       </h2>
