@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { formatDuration } from "@/lib/formatter";
 
 /**
  * TrackList
@@ -83,6 +84,9 @@ export default function TrackList({
                     {track.album}
                   </td>
                   <td className="px-3 py-2 text-(--text-muted)">{genres}</td>
+                  <td className="px-3 py-2 text-(--text-muted)">
+                    {formatDuration(track.durationMs)}
+                  </td>
                 </tr>
               );
             })}
