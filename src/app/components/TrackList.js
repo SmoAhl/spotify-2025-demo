@@ -205,8 +205,29 @@ export default function TrackList({
                   </td>
 
                   {/* Genret */}
-                  <td className="px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
-                    {getGenresText(track)}
+                  <td className="px-3 py-2 text-(--text-muted)">
+                    {/* Desktop / tablet: yksi rivi, truncate */}
+                    <span className="hidden sm:inline whitespace-nowrap truncate">
+                      {getGenresText(track)}
+                    </span>
+
+                    {/* Mobiili: max kaksi riviä (max kaksi genreä) */}
+                    <span className="block sm:hidden text-xs leading-snug">
+                      {Array.isArray(track.genres) &&
+                      track.genres.length > 0 ? (
+                        <>
+                          {track.genres[0]}
+                          {track.genres[1] && (
+                            <>
+                              <br />
+                              {track.genres[1]}
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        "unknown"
+                      )}
+                    </span>
                   </td>
 
                   {/* Kesto */}
