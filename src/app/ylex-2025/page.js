@@ -149,28 +149,28 @@ export default function YlexPlaylistPage() {
         {genreStats.length > 0 && (
           <section className="mx-auto max-w-3xl space-y-4 mt-10">
             <GenreChart stats={genreStats} />
-
-            <h2 className="text-base font-semibold text-(--text-strong)">
-              Mitä soittolista kertoo tämän hetken musiikista?
-            </h2>
-
-            <p>
-              Tämän otoksen perusteella Uuden Musiikin X -soittolista painottuu
-              selvästi genreen <strong>{genreStats[0]?.genre}</strong>. Se on
-              soittolistalla yleisin genre, ja sen alle osuu{" "}
-              <strong>{genreStats[0]?.count}</strong> kappaletta viidenkymmenen
-              biisin joukosta.
-            </p>
-
-            <p>
-              Samalla listalla on yhteensä <strong>{genreStats.length}</strong>{" "}
-              genreä, mikä kertoo, että soittolista kokoaa sekä valtavirtaa että
-              pienempiä alakulttuureja saman katon alle. Demossa käytetty
-              genredata tulee suoraan artistien Spotify-profiileista.
-            </p>
           </section>
         )}
+        <section className="mx-auto max-w-3xl space-y-4">
+          <h2 className="text-base sm:text-lg font-semibold text-(--text-strong)">
+            Mitä soittolista kertoo tämän hetken musiikista?
+          </h2>
 
+          <p>
+            Tämän otoksen perusteella Uuden Musiikin X -soittolista painottuu
+            selvästi genreen <strong>{genreStats[0]?.genre}</strong>. Se on
+            soittolistalla yleisin genre, ja sen alle osuu{" "}
+            <strong>{genreStats[0]?.count}</strong> kappaletta viidenkymmenen
+            biisin joukosta.
+          </p>
+
+          <p>
+            Samalla listalla on yhteensä <strong>{genreStats.length}</strong>{" "}
+            genreä, mikä kertoo, että soittolista kokoaa sekä valtavirtaa että
+            pienempiä alakulttuureja saman katon alle. Demossa käytetty
+            genredata tulee suoraan artistien Spotify-profiileista.
+          </p>
+        </section>
         <section className="mx-auto max-w-3xl space-y-4 text-sm text-(--text-primary)">
           <h3>Rajoitukset: mitä jäi analysoimatta?</h3>
           <p>
