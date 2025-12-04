@@ -7,6 +7,25 @@ import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 Chart.register(ArcElement, Tooltip, Legend);
 
 /**
+ * Generoi dynaaminen vihertävä väripaletti
+ * niin, että värien määrä = count.
+ */
+function generateColors(count) {
+  const colors = [];
+
+  for (let i = 0; i < count; i++) {
+    // Jakaa sävyt tasaisesti 200 asteen kaarella vihreän ympärillä
+    const hue = (130 + (200 * i) / Math.max(count, 1)) % 360;
+    const saturation = 70; // 0–100
+    const lightness = 30 + (i % 3) * 10; // 30, 40, 50 -> vähän vaihtelua
+
+    colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+  }
+
+  return colors;
+}
+
+/**
  * GenreChart
  *  - props.stats: [{ genre, count }]
  */
@@ -18,21 +37,16 @@ export default function GenreChart({ stats }) {
   const labels = stats.map((s) => s.genre);
   const dataValues = stats.map((s) => s.count);
 
-  // luetaan värit CSS-muuttujista (client-komponentti, joten ok)
-  const styles = getComputedStyle(document.documentElement);
-  const fern200 = styles.getPropertyValue("--border").trim();
-  const fern500 = styles.getPropertyValue("--accent").trim();
-  const textStrong = styles.getPropertyValue("--muted").trim();
-  const textPrimary = styles.getPropertyValue("--text-primary").trim();
-  const surface = styles.getPropertyValue("--surface").trim();
+  // generoidaan yhtä monta väriä kuin on genrejä
+  const colors = generateColors(labels.length);
 
   const data = {
     labels,
     datasets: [
       {
         data: dataValues,
-        backgroundColor: [fern200, fern500, textStrong],
-        borderColor: surface,
+        backgroundColor: colors,
+        borderColor: "#022c22", // tumma vihreä reuna (voit säätää)
         borderWidth: 1,
       },
     ],
@@ -46,12 +60,12 @@ export default function GenreChart({ stats }) {
       legend: {
         position: "bottom", // mobiilissa selkeämpi
         labels: {
-          color: textPrimary,
+          color: "#f9fafb", // vaalea teksti legendassa
         },
       },
       tooltip: {
-        bodyColor: textPrimary,
-        titleColor: textPrimary,
+        bodyColor: "#f9fafb",
+        titleColor: "#f9fafb",
       },
     },
   };

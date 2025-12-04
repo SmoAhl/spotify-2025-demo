@@ -41,10 +41,9 @@ export default function YlexPlaylistPage() {
           </p>
 
           <p>
-            Demo perustuu viiteenkymmeneen viimeisimpänä soittolistalle
-            lisättyyn kappaleeseen. Niistä on poimittu näkyviin kappaleen ja
-            artistien perustiedot sekä Spotify-algoritmin tarjoamaa dataa
-            suosiosta ja genrelokeroinnista.
+            Demo perustuu viimeisimpänä soittolistalle lisättyihin kappaleisiin.
+            Niistä on poimittu näkyviin kappaleen ja artistien perustiedot sekä
+            Spotify-algoritmin tarjoamaa dataa suosiosta ja genrelokeroinnista.
           </p>
           <p className="text-sm text-(--text-muted)">
             Koodi ja artikkeli on osittain tekoälyllä toteutettu.
@@ -191,7 +190,7 @@ export default function YlexPlaylistPage() {
             kehittäjiltä, mikä rajaa tällaisen tarkemman musiikillisen analyysin
             lähinnä Spotifyn omien työkalujen sisälle. Tässä demossa voidaan
             siksi tarkastella ennen kaikkea genrepainotuksia ja artistien
-            suosittuutta, mutta ei enää pureutua yhtä syvälle yksittäisten
+            suosiota, mutta ei enää pureutua yhtä syvälle yksittäisten
             kappaleiden rakenteeseen ja äänimaailmaan.
           </p>
         </section>
