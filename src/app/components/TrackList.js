@@ -48,7 +48,7 @@ export default function TrackList({
             <col className="w-[24%]" />
             <col className="hidden md:table-column w-[20%]" />
             <col className="w-[20%]" />
-            <col className="w-[8%]" />
+            <col className="hidden md:table-column w-[8%]" />
           </colgroup>
 
           <thead className="bg-(--table-header-bg) text-(--table-header-text)">
@@ -130,7 +130,7 @@ export default function TrackList({
                 </button>
               </th>
 
-              <th className="px-3 py-2 text-left">
+              <th className="hidden md:table-cell px-3 py-2 text-left">
                 <button
                   type="button"
                   onClick={() => onChangeSort("duration")}
@@ -210,7 +210,7 @@ export default function TrackList({
                   </td>
 
                   {/* Kesto */}
-                  <td className="text-right px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
+                  <td className="hidden md:table-cell text-right px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
                     {formatDuration(track.durationMs)}
                   </td>
                 </tr>
