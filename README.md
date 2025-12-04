@@ -29,6 +29,11 @@ The app fetches the 50 most recently added tracks and visualizes what kind of mu
 The app uses the Spotify Web API with the **Client Credentials** flow.  
 The following environment variables must be set (locally in `.env.local` and in Vercel project settings):
 
+```bash
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_CLIENT_SECRET=your_client_secret
+```
+
 ## Screenshots
 
 ![Header](<Screenshot 2025-12-04 130445.png>)
@@ -36,8 +41,3 @@ The following environment variables must be set (locally in `.env.local` and in 
 ![Playlist Column](<Screenshot 2025-12-04 130457.png>)
 
 ![Genres Piechart](<Screenshot 2025-12-04 130521.png>)
-
-```bash
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-```
