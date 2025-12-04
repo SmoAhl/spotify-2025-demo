@@ -32,6 +32,7 @@ The following environment variables must be set (locally in `.env.local` and in 
 ```bash
 SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
+YLEX_PLAYLIST_ID=4fuxTOA22t4d22iuVh5alE
 ```
 
 ## Screenshots
