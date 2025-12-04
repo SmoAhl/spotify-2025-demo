@@ -2,7 +2,11 @@
 
 import React from "react";
 import { formatDuration } from "@/lib/formatter";
-import { getArtistNodes, getGenresText } from "@/lib/trackHelper";
+import {
+  getArtistNodes,
+  getGenresText,
+  getMainArtistFollowersText,
+} from "@/lib/trackHelper";
 
 export default function TrackList({
   tracks,
@@ -42,7 +46,7 @@ export default function TrackList({
           <colgroup>
             <col className="w-[28%]" />
             <col className="w-[24%]" />
-            <col className="w-[20%]" />
+            <col className="hidden md:table-column w-[20%]" />
             <col className="w-[20%]" />
             <col className="w-[8%]" />
           </colgroup>
@@ -87,7 +91,8 @@ export default function TrackList({
                 </button>
               </th>
 
-              <th className="px-3 py-2 text-left">
+              {/* Albumi – piiloon mobiilissa */}
+              <th className="hidden md:table-cell px-3 py-2 text-left">
                 <button
                   type="button"
                   onClick={() => onChangeSort("album")}
@@ -149,19 +154,25 @@ export default function TrackList({
           <tbody>
             {tracks.map((track, index) => {
               const rowNumber = offset + index + 1;
-              const trackTooltipText = `Popularity: ${track.popularity ?? "?"}`;
+              const followersText = getMainArtistFollowersText(track);
+              const trackTooltipText = `Popularity: ${track.popularity ?? "?"}${
+                track.followers
+                  ? ` | Followers: ${track.followers.toLocaleString("fi-FI")}`
+                  : ""
+              }`;
 
               return (
                 <tr
                   key={track.id ?? rowNumber}
                   className="border-t border-(--border) hover:bg-(--table-row-hover)"
                 >
+                  {/* Kappale */}
                   <td className="px-3 py-2 font-semibold text-(--text-strong) whitespace-nowrap truncate">
                     {track.externalUrl ? (
                       <a
                         href={track.externalUrl}
                         target="_blank"
-                        title={trackTooltipText}
+                        title={trackTooltipText} // desktop-hover
                         rel="noreferrer"
                         className="text-(--link) underline-offset-4 hover:text-(--link-hover) hover:underline"
                       >
@@ -170,20 +181,35 @@ export default function TrackList({
                     ) : (
                       track.name
                     )}
+
+                    {/* Mobiilille lisärivi: suosio + seuraajat */}
+                    <div className="mt-0.5 text-xs text-(--text-muted) sm:hidden">
+                      Popularity: {track.popularity ?? "?"}
+                      {track.followers}
+                    </div>
                   </td>
 
+                  {/* Artistit */}
                   <td className="px-3 py-2 text-(--text-primary) whitespace-nowrap truncate">
                     {getArtistNodes(track)}
+
+                    {/* Mobiilille lisärivi: seuraajat */}
+                    <div className="mt-0.5 text-xs text-(--text-muted) sm:hidden">
+                      Seuraajat: {followersText}
+                    </div>
                   </td>
 
-                  <td className="px-3 py-2 text-(--text-primary) whitespace-nowrap truncate">
+                  {/* Albumi – näkyy vain md+ */}
+                  <td className="hidden md:table-cell px-3 py-2 text-(--text-primary) whitespace-nowrap truncate">
                     {track.album}
                   </td>
 
+                  {/* Genret */}
                   <td className="px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
                     {getGenresText(track)}
                   </td>
 
+                  {/* Kesto */}
                   <td className="text-right px-3 py-2 text-(--text-muted) whitespace-nowrap truncate">
                     {formatDuration(track.durationMs)}
                   </td>

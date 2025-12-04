@@ -93,9 +93,11 @@ export default function YlexPlaylistPage() {
           <p>
             Käyttäjä voi selata 50 viimeisimpänä soittolistaan lisättyä
             kappaletta, järjestää sarakkeita aakkosittain tai kappaleen keston
-            mukaan ja tarkastella tarkempia tietoja. Kappaleen ja artistin nimen
-            päällä pysähtyessä näkyvät suosioluku ja seuraajamäärä. Klikkaamalla
-            kappaletta tai artistia valintasi avautuu suoraan Spotifyssa.
+            mukaan ja tarkastella tarkempia tietoja. Työpöytänäkymässä kappaleen
+            ja artistin nimen päällä pysähtyessä näkyvät lisätietona suosioluku
+            ja seuraajamäärä. Mobiilinäkymässä samat tiedot näkyvät erillisillä
+            tekstiriveillä kappaleen ja artistin alla. Klikkaamalla kappaletta
+            tai artistia valinta avautuu suoraan Spotifyssa.
           </p>
 
           <p>

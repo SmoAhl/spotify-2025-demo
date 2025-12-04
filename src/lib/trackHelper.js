@@ -1,5 +1,17 @@
 import React from "react";
 
+// trackHelper.js
+export function getMainArtistFollowersText(track) {
+  const artists = Array.isArray(track.artists) ? track.artists : [];
+  const main = artists[0];
+
+  if (!main || typeof main.followers !== "number") {
+    return "?";
+  }
+
+  return main.followers.toLocaleString("fi-FI");
+}
+
 /**
  * Palauttaa JSX:n Artistit-saraketta varten.
  * track.artists: [{ id, name, popularity?, followers?, externalUrl? }]

@@ -1,13 +1,5 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div>
-      <ul>
-        <li>
-          <Link href="/ylex-2025">YleX Uuden Musiikin Lista</Link>
-        </li>
-      </ul>
-    </div>
-  );
+  return redirect("/ylex-2025");
 }
