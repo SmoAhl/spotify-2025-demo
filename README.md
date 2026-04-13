@@ -1,39 +1,50 @@
 # YleX New Music Playlist – Spotify Data Demo
 
-https://spotify-2025-demo.vercel.app/ylex-2025
+Live demo: https://spotify-2025-demo.vercel.app/ylex-2025
 
-This is a small data journalism demo that analyzes the **YleX Uuden Musiikin X** Spotify playlist.  
-The app fetches the 50 most recently added tracks and visualizes what kind of music ends up on the list right now.
+Interactive data dashboard that analyzes the YleX Uuden Musiikin X Spotify playlist.
+
+The application fetches real-time playlist data from Spotify, processes it, and presents it through a user-friendly interface with visualizations and analysis.
 
 ## Features
 
-- Fetches playlist and artist data from the **Spotify Web API**
+- Fetches playlist and artist data from the Spotify Web API
+- Processes and aggregates track metadata (genres, duration, artists)
 - Sortable track table (title, artist, album, genre, duration)
-- Mobile-friendly layout (reduced columns, extra info on small screens)
-- Pie chart showing the **genre distribution** of the playlist
-- Short written analysis based on the fetched data
-- Deployed on **Vercel**
-
-> Note: There are intentionally many comments left in the codebase, as this is an ongoing learning project and I plan to keep iterating on it.
+- Responsive UI (optimized for mobile and desktop)
+- Genre distribution visualization (Chart.js)
+- Lightweight analysis layer based on fetched data
+- Deployed on Vercel
 
 ## Tech Stack
 
-- **Next.js 16** (App Router)
-- **React**
-- **Chart.js + react-chartjs-2** (genre pie chart)
-- Utility-class–style CSS
+- Next.js (App Router)
+- TypeScript / JavaScript
+- React
+- Chart.js + react-chartjs-2
 - Spotify Web API (Client Credentials flow)
+- Vercel (deployment)
+
+## What this project demonstrates
+
+- Building a full-stack data-driven web application
+- Integrating external APIs and handling asynchronous data flows
+- Transforming raw API data into structured, user-facing insights
+- Creating responsive and interactive data visualizations
 
 ## Data Source
 
-The app uses the Spotify Web API with the **Client Credentials** flow.  
-The following environment variables must be set (locally in `.env.local` and in Vercel project settings):
+The app uses the Spotify Web API with the Client Credentials flow.
 
-```bash
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
+Required environment variables:
+
+SPOTIFY_CLIENT_ID=your_client_id  
+SPOTIFY_CLIENT_SECRET=your_client_secret  
 YLEX_PLAYLIST_ID=4fuxTOA22t4d22iuVh5alE
-```
+
+## Notes
+
+This project is intentionally iterative. The codebase includes comments and is continuously improved as part of ongoing learning and development.
 
 ## Screenshots
 
